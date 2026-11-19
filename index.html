@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Pipeline Explorer | Interactive 3D Educational Platform</title>
+  <meta name="description" content="An interactive, beginner-friendly educational web application visually demonstrating how Large Language Models (LLMs) process human language internally.">
+
+  <!-- Core CSS Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pipeline.css">
+
+  <!-- Three.js & OrbitControls via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+  <!-- ======================================================================
+       Global Header & Navigation
+       ====================================================================== -->
+  <header class="app-header">
+    <div class="brand-group">
+      <div class="brand-logo-icon">⚡</div>
+      <div class="brand-text">
+        <h1>LLM Pipeline Explorer</h1>
+        <div class="brand-tag">Deep Learning &bull; Tokenizer &bull; 3D Embeddings</div>
+      </div>
+    </div>
+
+    <nav class="main-nav" aria-label="Main Navigation">
+      <a href="#dashboard" class="nav-link active" data-view="dashboard">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="#pipeline" class="nav-link" data-view="pipeline">
+        <span class="nav-icon">🔄</span> Pipeline Flow
+      </a>
+      <a href="#tokenization" class="nav-link" data-view="tokenization">
+        <span class="nav-icon">✂️</span> Tokenization
+      </a>
+      <a href="#vocabulary" class="nav-link" data-view="vocabulary">
+        <span class="nav-icon">📖</span> Vocabulary
+      </a>
+      <a href="#embeddings" class="nav-link" data-view="embeddings">
+        <span class="nav-icon">🧬</span> Embeddings
+      </a>
+      <a href="#3d-explorer" class="nav-link" data-view="3d-explorer">
+        <span class="nav-icon">🌐</span> 3D Explorer
+      </a>
+      <a href="#add-words" class="nav-link" data-view="add-words">
+        <span class="nav-icon">➕</span> Add New Words
+      </a>
+      <a href="#about" class="nav-link" data-view="about">
+        <span class="nav-icon">💡</span> About LLM
+      </a>
+    </nav>
+  </header>
+
+  <!-- ======================================================================
+       Main Content Views
+       ====================================================================== -->
+  <main class="app-main">
+
+    <!-- ------------------------------------------------------------------
+         VIEW 1: Dashboard
+         ------------------------------------------------------------------ -->
+    <section id="view-dashboard" class="view-section active">
+      <div class="view-header">
+        <div class="view-title-area">
+          <h2>LLM Journey Overview</h2>
+          <p class="view-subtitle">Interactive visualization of how raw human text transforms into mathematical tokens and geometric embeddings.</p>
+        </div>
+        <button type="button" class="btn btn-primary" data-navigate="tokenization">
+          🚀 Open Playground
+        </button>
+      </div>
+
+      <!-- Stat Metrics -->
+      <div class="stats-grid">
+        <div class="metric-card">
+          <div class="metric-icon">📖</div>
+          <div class="metric-info">
+            <span class="metric-label">Vocabulary Size</span>
+            <span class="metric-value" id="dash-vocab-count">0</span>
+          </div>
+        </div>
+        <div class="metric-card purple">
+          <div class="metric-icon">✂️</div>
+          <div class="metric-info">
+            <span class="metric-label">Tokens Processed</span>
+            <span class="metric-value" id="dash-tokens-count">0</span>
+          </div>
+        </div>
+        <div class="metric-card amber">
+          <div class="metric-icon">⭐</div>
+          <div class="metric-info">
+            <span class="metric-label">Custom Words Added</span>
+            <span class="metric-value" id="dash-custom-count">0</span>
+          </div>
+        </div>
+        <div class="metric-card emerald">
+          <div class="metric-icon">🌐</div>
+          <div class="metric-info">
+            <span class="metric-label">Embeddings Visualized</span>
+            <span class="metric-value" id="dash-embeddings-count">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Pipeline Overview Teaser -->
+      <div class="glass-card mb-6" style="margin-bottom: 2rem;">
+        <div class="card-sec-header">
+          <h3 class="card-sec-title"><span>🔄</span> Complete Pipeline Roadmap</h3>
+          <button type="button" class="btn btn-secondary btn-sm" data-navigate="pipeline">
+            Inspect Full Pipeline ➔
+          </button>
+        </div>
+        <p class="mb-4" style="margin-bottom: 1.25rem;">
+          How a prompt travels from human keyboard characters to neural weights:
+        </p>
+        <div class="pipeline-cards-row" style="padding-top: 0;">
+          <div class="pipeline-card" data-navigate="pipeline">
+            <div class="card-step-badge">1</div>
+            <div class="card-header"><span class="card-icon">💬</span><strong>Input Text</strong></div>
+            <div class="card-sub">Raw string sequence</div>
+          </div>
+          <div class="pipeline-connector"><div class="connector-arrow"></div></div>
+          <div class="pipeline-card" data-navigate="pipeline">
+            <div class="card-step-badge">2</div>
+            <div class="card-header"><span class="card-icon">✂️</span><strong>Tokenization</strong></div>
+            <div class="card-sub">Splitting into tokens</div>
+          </div>
+          <div class="pipeline-connector"><div class="connector-arrow"></div></div>
+          <div class="pipeline-card" data-navigate="pipeline">
+            <div class="card-step-badge">3</div>
+            <div class="card-header"><span class="card-icon">📖</span><strong>Vocab Lookup</strong></div>
+            <div class="card-sub">Dictionary matching</div>
+          </div>
+          <div class="pipeline-connector"><div class="connector-arrow"></div></div>
+          <div class="pipeline-card" data-navigate="pipeline">
+            <div class="card-step-badge">4</div>
+            <div class="card-header"><span class="card-icon">🔢</span><strong>Token IDs</strong></div>
+            <div class="card-sub">Tensor of integers</div>
+          </div>
+          <div class="pipeline-connector"><div class="connector-arrow"></div></div>
+          <div class="pipeline-card" data-navigate="pipeline">
+            <div class="card-step-badge">5</div>
+            <div class="card-header"><span class="card-icon">🧬</span><strong>Embeddings</strong></div>
+            <div class="card-sub">Dense vector space</div>
+          </div>
+          <div class="pipeline-connector"><div class="connector-arrow"></div></div>
+          <div class="pipeline-card" data-navigate="pipeline">
+            <div class="card-step-badge">6</div>
+            <div class="card-header"><span class="card-icon">🌐</span><strong>3D Space</strong></div>
+            <div class="card-sub">PCA dimension reduction</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Cards Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+        <!-- Recent Activity Feed -->
+        <div class="glass-card">
+          <div class="card-sec-header">
+            <h3 class="card-sec-title"><span>⏱️</span> Recent Tokenization Activity</h3>
+            <button type="button" class="btn btn-secondary btn-sm" data-navigate="tokenization">New Prompt</button>
+          </div>
+          <div id="dash-recent-activity">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Educational Highlights -->
+        <div class="glass-card">
+          <div class="card-sec-header">
+            <h3 class="card-sec-title"><span>💡</span> Why Text Must Become Numbers</h3>
+          </div>
+          <p style="margin-bottom: 1rem;">
+            Computers and neural networks have no biological understanding of words or grammar. They only perform matrix multiplications and dot products.
+          </p>
+          <div style="background: rgba(0,0,0,0.3); border-radius: var(--radius-sm); padding: 1rem; border-left: 3px solid var(--accent-cyan);">
+            <div style="font-weight: 700; color: #ffffff; margin-bottom: 0.35rem;">The Core Pipeline Formula:</div>
+            <div class="font-mono text-cyan text-sm">
+              "king" ➔ Token ID #57 ➔ W_e[57] ➔ [0.3, -0.7, 0.6, ...] ➔ 3D Sphere [14, -14, -8]
+            </div>
+          </div>
+          <div style="margin-top: 1.25rem; display: flex; gap: 0.5rem;">
+            <button type="button" class="btn btn-purple btn-sm" data-navigate="3d-explorer">Explore 3D Galaxy ➔</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-navigate="about">Read Deep Dive</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------
+         VIEW 2: Pipeline Visualization (Module 6)
+         ------------------------------------------------------------------ -->
+    <section id="view-pipeline" class="view-section">
+      <div class="view-header">
+        <div class="view-title-area">
+          <h2>Interactive LLM Pipeline Journey</h2>
+          <p class="view-subtitle">Follow your text step-by-step from human input through tokenization, integer tensors, dense vectors, and 3D space.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" id="btn-pipeline-tour" class="btn btn-purple">
+            <span class="icon">▶</span> Walkthrough Tour
+          </button>
+          <button type="button" id="btn-pipeline-prev" class="btn btn-secondary btn-sm">◀ Prev</button>
+          <button type="button" id="btn-pipeline-next" class="btn btn-secondary btn-sm">Next ▶</button>
+        </div>
+      </div>
+
+      <!-- Multi-Stage Horizontal Stepper Cards -->
+      <div class="pipeline-stepper-wrap">
+        <div id="pipeline-cards-row" class="pipeline-cards-row">
+          <!-- Dynamically populated by PipelineVisualizer -->
+        </div>
+      </div>
+
+      <!-- Stage Detailed Inspector Card -->
+      <div id="pipeline-stage-detail">
+        <!-- Dynamically populated by PipelineVisualizer -->
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------
+         VIEW 3: Tokenization Playground (Module 3)
+         ------------------------------------------------------------------ -->
+    <section id="view-tokenization" class="view-section">
+      <div class="view-header">
+        <div class="view-title-area">
+          <h2>Tokenization Playground</h2>
+          <p class="view-subtitle">Type or paste any text to observe how the tokenizer parses words, assigns colors, maps unique Token IDs, and identifies boundaries.</p>
+        </div>
+      </div>
+
+      <div class="glass-card mb-6" style="margin-bottom: 1.75rem;">
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+            <label for="playground-input" class="form-label" style="margin-bottom: 0;">Input Text / Prompt:</label>
+            <label class="toggle-wrap">
+              <input type="checkbox" id="toggle-auto-tokenize" class="toggle-checkbox" checked>
+              <span>Live Auto-Tokenize</span>
+            </label>
+          </div>
+          <textarea id="playground-input" class="form-textarea" placeholder="Type a sentence or paragraph here to see it tokenized into numerical IDs..."></textarea>
+        </div>
+
+        <div class="presets-bar">
+          <span class="preset-label">Sample Presets:</span>
+          <div id="presets-pills" style="display: flex; gap: 0.4rem; flex-wrap: wrap;"></div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem; align-items: center; flex-wrap: wrap;">
+          <button type="button" id="btn-tokenize" class="btn btn-primary">
+            ✂️ Tokenize Text
+          </button>
+          <button type="button" id="btn-clear-input" class="btn btn-secondary">
+            Clear
+          </button>
+          <span class="text-muted text-xs">Tip: Click on any generated token badge to inspect its embedding vector.</span>
+        </div>
+      </div>
+
+      <!-- Tokenized Stream Output -->
+      <div class="glass-card mb-6" style="margin-bottom: 1.75rem;">
+        <div class="card-sec-header">
+          <h3 class="card-sec-title"><span>🏷️</span> Generated Token Sequence</h3>
+          <span class="text-xs text-muted">Each color marks a distinct token slice</span>
+        </div>
+        <div id="tokenized-badges-container" class="tokens-display-box">
+          <!-- Populated with color-coded token pills -->
+        </div>
+
+        <!-- Token Stats -->
+        <div id="token-stats-row" class="token-stats-row"></div>
+      </div>
+
+      <!-- Side-by-side / Visual Boundary Display -->
+      <div class="glass-card">
+        <div class="card-sec-header">
+          <h3 class="card-sec-title"><span>🔍</span> Text Boundaries & Sequence Alignment</h3>
+          <span class="text-xs text-muted">Hover over highlighted spans to view token boundaries</span>
+        </div>
+        <div id="original-text-highlighted" class="text-boundary-preview">
+          <!-- Highlighting original text -->
+        </div>
+      </div>
+
+      <!-- Educational Note on Tokenizers -->
+      <div class="sd-real-world" style="margin-top: 1.5rem;">
+        <div class="rw-title"><span class="rw-badge">Educational Tokenizer vs Production LLMs</span></div>
+        <p class="rw-desc">
+          This playground demonstrates deterministic word/punctuation tokenization. Modern production LLMs (like GPT-4, Gemini, and Llama) use <strong>Byte-Pair Encoding (BPE)</strong> or <strong>WordPiece</strong>, which recursively merges frequent subword pairs. A word like <em>"unbreakable"</em> might become <code>["un", "break", "able"]</code>. This prevents the model from ever failing on unknown or misspelled words!
+        </p>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------
+         VIEW 4: Vocabulary Explorer (Module 1)
+         ------------------------------------------------------------------ -->
+    <section id="view-vocabulary" class="view-section">
+      <div class="view-header">
+        <div class="view-title-area">
+          <h2>Vocabulary Explorer</h2>
+          <p class="view-subtitle">Inspect the complete dictionary of known tokens, Token IDs, categories, and estimated corpus frequencies.</p>
+        </div>
+        <button type="button" class="btn btn-primary" data-navigate="add-words">
+          ➕ Add Custom Word
+        </button>
+      </div>
+
+      <div class="glass-card">
+        <!-- Filters & Search Toolbar -->
+        <div class="filters-bar">
+          <div class="search-input-wrap">
+            <input type="text" id="vocab-search" class="form-input" placeholder="Search by word, Token ID (e.g. #25), or category...">
+          </div>
+
+          <div style="min-width: 170px;">
+            <select id="vocab-cat-filter" class="form-select"></select>
+          </div>
+
+          <div style="min-width: 150px;">
+            <select id="vocab-sort-by" class="form-select">
+              <option value="id">Sort by Token ID</option>
+              <option value="word">Sort Alphabetical</option>
+              <option value="freq">Sort by Frequency</option>
+            </select>
+          </div>
+
+          <button type="button" id="vocab-sort-order-btn" class="btn btn-secondary btn-sm" title="Toggle Ascending / Descending">
+            ⬆ Asc
+          </button>
+
+          <div style="margin-left: auto; display: flex; gap: 0.5rem; align-items: center;">
+            <span id="vocab-total-badge" class="footer-pill font-mono text-cyan">0 words</span>
+            <span id="vocab-custom-badge" class="footer-pill font-mono text-amber">0 custom</span>
+          </div>
+        </div>
+
+        <!-- Vocabulary Data Table -->
+        <div class="table-container">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th style="width: 110px;">Token ID</th>
+                <th>Word / Token</th>
+                <th>Category / Domain</th>
+                <th>Sample Frequency</th>
+                <th>3D Projection Coords</th>
+                <th style="width: 140px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="vocab-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------
+         VIEW 5: Embedding Explorer (Module 4)
+         ------------------------------------------------------------------ -->
+    <section id="view-embeddings" class="view-section">
+      <div class="view-header">
+        <div class="view-title-area">
+          <h2>High-Dimensional Embedding Explorer</h2>
+          <p class="view-subtitle">Inspect dense numerical vectors ($d = 16$), understand vector directions, and compute cosine similarity between tokens.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
+        <!-- Vector Inspector Card -->
+        <div class="glass-card">
+          <div class="card-sec-header">
+            <h3 class="card-sec-title"><span>🧬</span> Inspect Token Vector</h3>
+            <span class="footer-pill text-cyan">d_model = 16 dimensions</span>
+          </div>
+
+          <div class="form-group">
+            <label for="emb-token-select" class="form-label">Select Token from Vocabulary:</label>
+            <select id="emb-token-select" class="form-select"></select>
+          </div>
+
+          <div id="emb-token-details">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div style="margin-top: 1.25rem;">
+            <span class="form-label">16-Dimensional Heatmap ($[-1.0, +1.0]$):</span>
+            <div id="emb-vector-heatmap" class="vector-heatmap-grid"></div>
+          </div>
+
+          <div style="margin-top: 1.25rem;">
+            <span class="form-label">Raw Numerical Array:</span>
+            <div id="emb-raw-values" class="code-block" style="font-size: 0.8rem; word-break: break-all;"></div>
+          </div>
+        </div>
+
+        <!-- Cosine Similarity & Vector Math Card -->
+        <div class="glass-card">
+          <div class="card-sec-header">
+            <h3 class="card-sec-title"><span>📐</span> Semantic Similarity Calculator</h3>
+            <span class="footer-pill text-purple">Cosine Metric $\cos(\theta)$</span>
+          </div>
+
+          <p class="text-sm" style="margin-bottom: 1rem;">
+            In language models, words with related meanings point in similar directions in vector space. Compare any two tokens:
+          </p>
+
+          <div class="sim-comparison-row">
+            <div class="sim-token-picker">
+              <label for="sim-word-a" class="form-label">Token A:</label>
+              <select id="sim-word-a" class="form-select"></select>
+            </div>
+            <div class="sim-vs-badge">VS</div>
+            <div class="sim-token-picker">
+              <label for="sim-word-b" class="form-label">Token B:</label>
+              <select id="sim-word-b" class="form-select"></select>
+            </div>
+          </div>
+
+          <!-- Quick presets for similarity -->
+          <div style="margin-bottom: 1.25rem; display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <span class="text-xs text-muted" style="align-self: center;">Try pairs:</span>
+            <button type="button" class="preset-pill-btn sim-preset-btn" data-word-a="king" data-word-b="queen">👑 king & queen</button>
+            <button type="button" class="preset-pill-btn sim-preset-btn" data-word-a="cat" data-word-b="dog">🐾 cat & dog</button>
+            <button type="button" class="preset-pill-btn sim-preset-btn" data-word-a="neural" data-word-b="transformer">🤖 neural & transformer</button>
+            <button type="button" class="preset-pill-btn sim-preset-btn" data-word-a="king" data-word-b="fox">⚡ king & fox</button>
+          </div>
+
+          <div class="sim-score-display">
+            <div id="sim-score-value" class="sim-score-num text-cyan">0.0000</div>
+            <div class="sim-score-label">Cosine Similarity Score (-1 to +1)</div>
+            <div class="text-xs text-muted" style="margin-top: 0.25rem;">Euclidean Distance: <span id="sim-euclidean-value" class="font-mono text-purple">0.00</span></div>
+          </div>
+
+          <div class="sim-bar-wrap">
+            <div id="sim-progress-bar" class="sim-bar-fill" style="width: 50%;"></div>
+          </div>
+
+          <div id="sim-explanation">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------
+         VIEW 6: 3D Embedding Explorer (Module 5)
+         ------------------------------------------------------------------ -->
+    <section id="view-3d-explorer" class="view-section">
+      <div class="view-header">
+        <div class="view-title-area">
+          <h2>Interactive 3D Embedding Galaxy</h2>
+          <p class="view-subtitle">Rotate, zoom, and pan around the 3D embedding space. Observe semantic clusters and the prompt trajectory path.</p>
+        </div>
+      </div>
+
+      <!-- 3D Canvas Viewport Wrap -->
+      <div class="three-viewport-wrap">
+        <!-- Floating Toolbar -->
+        <div class="canvas-toolbar">
+          <button type="button" id="btn-toggle-labels" class="canvas-tool-btn active">
+            🏷️ Labels: ON
+          </button>
+          <button type="button" id="btn-toggle-trajectory" class="canvas-tool-btn active">
+            ⚡ Trajectory: ON
+          </button>
+          <button type="button" id="btn-reset-camera" class="canvas-tool-btn">
+            🎯 Reset Camera
+          </button>
+        </div>
+
+        <!-- 3D Word Search -->
+        <div class="canvas-search-box">
+          <input type="text" id="search-3d-input" class="canvas-search-input" placeholder="🔍 Find word in 3D...">
+        </div>
+
+        <!-- Three.js Canvas Mount -->
+        <div id="three-canvas-container"></div>
+
+        <!-- Category Color Legend -->
+        <div class="canvas-legend">
+          <div class="legend-title">Semantic Clusters</div>
+          <div class="legend-items">
+            <div class="legend-item"><span class="legend-dot" style="background:#38bdf8;"></span> AI & Tech</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> Royalty / Human</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#34d399;"></span> Animals</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#a855f7;"></span> Verbs</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> Nature</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#94a3b8;"></span> Grammar</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#eab308;"></span> Custom Added</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technical Educational Callout -->
+      <div class="glass-card mt-6" style="margin-top: 1.5rem;">
+        <div class="card-sec-header">
+          <h3 class="card-sec-title"><span>📐</span> Understanding 3D Projections (PCA & Dimensionality Reduction)</h3>
+        </div>
+        <p style="margin-bottom: 0.75rem;">
+          In real-world language models, embedding vectors live in spaces with <strong>768 to 12,288 dimensions</strong>! Since human eyes cannot perceive higher than 3 dimensions, scientists use <strong>Principal Component Analysis (PCA)</strong> or <strong>t-SNE / UMAP</strong> to project high-dimensional variance onto 3 orthogonal axes $[X, Y, Z]$.
+        </p>
+        <div class="alert-box alert-warning" style="margin-bottom: 0;">
+          <strong>Educational Notice:</strong> The 3D coordinates shown here are illustrative reduced-dimensional projections, not the raw 16-D or 4,096-D vectors. The glowing dashed line visualizes the <em>trajectory</em> of your input prompt moving through semantic space before Transformer attention contextualizes each word!
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------
+         VIEW 7: Add New Words (Module 2)
+         ------------------------------------------------------------------ -->
+    <section id="view-add-words" class="view-section">
+      <div class="view-header">
+        <div class="view-title-area">
+          <h2>Expand Educational Vocabulary</h2>
+          <p class="view-subtitle">Add custom words to the local vocabulary dictionary, generate unique Token IDs, and see them immediately available to the tokenizer and 3D space.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
+        <!-- Add Word Form -->
+        <div class="glass-card">
+          <div class="card-sec-header">
+            <h3 class="card-sec-title"><span>➕</span> Add a New Vocabulary Entry</h3>
+          </div>
+
+          <div id="add-word-alert" class="alert-box" style="display: none;"></div>
+
+          <form id="add-word-form">
+            <div class="form-group">
+              <label for="new-word-input" class="form-label">New Word:</label>
+              <input type="text" id="new-word-input" class="form-input" placeholder="e.g. quantum, cybernetic, galaxy..." autocomplete="off" required>
+              <span class="text-xs text-muted" style="margin-top: 0.25rem; display: block;">Letters only; single word without spaces.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="new-word-category" class="form-label">Semantic Category / Cluster:</label>
+              <select id="new-word-category" class="form-select"></select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+              ✨ Add to Vocabulary
+            </button>
+          </form>
+
+          <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 1.5rem 0;">
+
+          <div>
+            <span class="form-label">Manage Custom Entries:</span>
+            <button type="button" id="btn-reset-custom-vocab" class="btn btn-danger btn-sm">
+              🗑️ Reset All Custom Words
+            </button>
+          </div>
+        </div>
+
+        <!-- Educational Disclaimer Card (Required by Instructions) -->
+        <div class="glass-card highlight">
+          <div class="card-sec-header">
+            <h3 class="card-sec-title text-amber"><span>⚠️</span> Essential AI Distinction</h3>
+            <span class="footer-pill text-amber">Educational Notice</span>
+          </div>
+
+          <p style="margin-bottom: 1rem; color: #f1f5f9;">
+            <strong>Important distinction:</strong> Adding a word here adds it to this application's educational vocabulary dictionary and calculates an initial embedding vector for visualization.
+          </p>
+          <p style="margin-bottom: 1rem;">
+            In a <strong>real pre-trained LLM</strong> (such as GPT-4, Llama 3, or Claude), the vocabulary is strictly fixed during pre-training. Adding a new word does <strong>NOT</strong> change the weights, parameters, or internal layers of the neural network.
+          </p>
+          <div style="background: rgba(0,0,0,0.4); border-radius: var(--radius-sm); padding: 0.85rem; border-left: 3px solid var(--accent-amber); font-size: 0.85rem;">
+            To support new words in production, engineers either break them into known subwords (via Byte-Pair Encoding) or perform full continual pre-training and fine-tuning with expanded embedding matrices.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------
+         VIEW 8: About LLM Pipeline (Module 5 & 7)
+         ------------------------------------------------------------------ -->
+    <section id="view-about" class="view-section">
+      <div class="view-header">
+        <div class="view-title-area">
+          <h2>Demystifying LLM Pipelines</h2>
+          <p class="view-subtitle">Clear, beginner-friendly answers to the most fundamental questions about how language models convert human thoughts into mathematics.</p>
+        </div>
+      </div>
+
+      <div class="edu-qa-grid">
+        <!-- Q1: What is a token? -->
+        <div class="edu-card">
+          <h3 class="edu-q-title"><span class="text-cyan">1.</span> What is a Token?</h3>
+          <p class="edu-answer">
+            A token is the atomic unit of text that an LLM reads and generates. It can be an entire word, part of a word (a subword or syllable), a punctuation symbol, or even a single whitespace.
+          </p>
+          <div class="edu-example">
+            "apple" ➔ 1 token | "unbelievable" ➔ ["un", "believ", "able"] (3 tokens)
+          </div>
+        </div>
+
+        <!-- Q2: Why do LLMs tokenize text? -->
+        <div class="edu-card">
+          <h3 class="edu-q-title"><span class="text-cyan">2.</span> Why Do LLMs Tokenize Text?</h3>
+          <p class="edu-answer">
+            Computers cannot natively read sentences. Neural networks are composed of mathematical matrix multiplications that require discrete numerical indices. Tokenization maps infinite raw text combinations into a manageable, discrete set of IDs.
+          </p>
+          <div class="edu-example">
+            Human string ➔ Discrete Tokens ➔ Fixed-size Math Input
+          </div>
+        </div>
+
+        <!-- Q3: What is a vocabulary? -->
+        <div class="edu-card">
+          <h3 class="edu-q-title"><span class="text-cyan">3.</span> What is a Vocabulary?</h3>
+          <p class="edu-answer">
+            The vocabulary is the model's fixed master dictionary. Every token the model can ever see or speak is indexed in this table. Most modern models maintain vocabularies between 32,000 and 256,000 unique tokens.
+          </p>
+          <div class="edu-example">
+            Vocabulary = { 0: "&lt;pad&gt;", 1: "&lt;unk&gt;", ..., 57: "king", ... }
+          </div>
+        </div>
+
+        <!-- Q4: What is a Token ID? -->
+        <div class="edu-card">
+          <h3 class="edu-q-title"><span class="text-cyan">4.</span> What is a Token ID?</h3>
+          <p class="edu-answer">
+            A Token ID is the unique integer assigned to each entry in the vocabulary. It serves as an array index that points to the exact row in the model's weight matrix.
+          </p>
+          <div class="edu-example">
+            "attention" ➔ Token ID #32 ➔ row 32 of Embedding Table
+          </div>
+        </div>
+
+        <!-- Q5: What are embeddings? -->
+        <div class="edu-card">
+          <h3 class="edu-q-title"><span class="text-cyan">5.</span> What are Embeddings?</h3>
+          <p class="edu-answer">
+            Embeddings are dense numerical representations of tokens. Instead of arbitrary integers, each word is mapped to a vector of floating-point numbers where semantic concepts are encoded geometrically.
+          </p>
+          <div class="edu-example">
+            "queen" ➔ [0.30, -0.70, 0.60, -0.50, 0.90, ...]
+          </div>
+        </div>
+
+        <!-- Q6: Why vectors? -->
+        <div class="edu-card">
+          <h3 class="edu-q-title"><span class="text-cyan">6.</span> Why Vectors Instead of Numbers?</h3>
+          <p class="edu-answer">
+            A single number cannot capture the richness of human language. A vector with dozens or thousands of dimensions can simultaneously encode multiple independent properties: tense, gender, sentiment, part of speech, and physical size.
+          </p>
+          <div class="edu-example">
+            Dim 1: living vs nonliving | Dim 2: royal vs common | Dim 3: scale
+          </div>
+        </div>
+
+        <!-- Q7: What does 3D projection mean? -->
+        <div class="edu-card">
+          <h3 class="edu-q-title"><span class="text-cyan">7.</span> What is 3D Projection?</h3>
+          <p class="edu-answer">
+            Because human minds cannot perceive 16 or 4,096 dimensions, mathematical algorithms like Principal Component Analysis (PCA) find the three axes of greatest statistical variance and plot the tokens in 3D $[X, Y, Z]$ space.
+          </p>
+          <div class="edu-example">
+            16-Dimensional Point ➔ Matrix Projection ➔ 3D Coordinates
+          </div>
+        </div>
+
+        <!-- Q8: Why related words cluster? -->
+        <div class="edu-card">
+          <h3 class="edu-q-title"><span class="text-cyan">8.</span> Why Do Related Words Cluster?</h3>
+          <p class="edu-answer">
+            During training, the model adjusts vector weights so words that frequently appear in similar textual contexts (like "dog" and "wolf", or "neural" and "transformer") end up pointing in almost the same direction in vector space.
+          </p>
+          <div class="edu-example">
+            Cosine Similarity("king", "queen") &gt; Cosine Similarity("king", "apple")
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================================
+       Global Footer
+       ====================================================================== -->
+  <footer class="app-footer">
+    <div>
+      <strong>LLM Pipeline Explorer</strong> &bull; Educational Deep Learning & AI Architecture Platform
+    </div>
+    <div class="footer-badges">
+      <span class="footer-pill">Client-Side Architecture</span>
+      <span class="footer-pill">Three.js 3D Engine</span>
+      <span class="footer-pill">Local Persistence</span>
+    </div>
+  </footer>
+
+  <!-- ======================================================================
+       Token & Vocabulary Item Modal Inspector
+       ====================================================================== -->
+  <div id="token-inspector-modal" class="modal-overlay">
+    <div class="modal-content">
+      <button type="button" id="modal-close-btn" class="modal-close-btn" title="Close Modal">&times;</button>
+
+      <div style="margin-bottom: 1rem;">
+        <span class="text-xs text-muted" style="text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Token Details Inspector</span>
+        <div style="display: flex; align-items: baseline; gap: 0.75rem; margin-top: 0.25rem;">
+          <h3 id="modal-token-title" style="font-size: 1.85rem; color: #ffffff;">"word"</h3>
+          <span id="modal-token-id" class="font-mono text-cyan" style="font-size: 1.25rem; font-weight: 700;">#0</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          <span class="text-xs text-muted">Semantic Domain:</span>
+          <div id="modal-token-category" style="font-weight: 700; margin-top: 0.15rem;">Domain</div>
+        </div>
+        <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          <span class="text-xs text-muted">Corpus Frequency:</span>
+          <div id="modal-token-freq" class="font-mono text-muted" style="margin-top: 0.15rem;">~0</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <span class="text-xs text-muted">3D Space Coordinates:</span>
+        <div id="modal-token-coords" class="font-mono text-cyan text-sm" style="margin-top: 0.25rem;">[X: 0, Y: 0, Z: 0]</div>
+      </div>
+
+      <div id="modal-token-subword-note" style="margin-bottom: 1.25rem; display: none;"></div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <span class="text-xs text-muted">16-Dimensional Embedding Representation:</span>
+        <div id="modal-token-vector" class="vector-heatmap-grid" style="margin-top: 0.45rem;"></div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button type="button" id="modal-btn-view-3d" class="btn btn-primary">
+          🌐 View & Focus in 3D Explorer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Modules in Dependency Order -->
+  <script src="js/config.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/tokenizer.js"></script>
+  <script src="js/embeddings.js"></script>
+  <script src="js/visualizer3d.js"></script>
+  <script src="js/pipeline.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
